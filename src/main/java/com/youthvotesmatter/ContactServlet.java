@@ -56,8 +56,13 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
         // TODO: 这里可扩展为：写入数据库 / 发送邮件 / 写日志
         System.out.println("Form -> name=" + name + " | email=" + email + " | message=" + message);
 
-        response.getWriter().write("<h2>提交成功！</h2><p>谢谢你，"
-                + escape(name) + "，我们已经收到你的消息。</p>");
+        response.getWriter().write(
+            "<html><body>" +
+        "<h2>Message Submitted Successfully!</h2>" +
+        "<p>Thank you, " + name + ". Your message has been received.</p>" +
+        "<p>We will get back to you shortly.</p>" +
+        "</body></html>"
+        );
     }
 
     private static boolean isBlank(String s){

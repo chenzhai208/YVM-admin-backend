@@ -24,6 +24,19 @@ public class ContactServlet extends HttpServlet {
     }
 
     @Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    addCors(request, response);
+    response.setContentType("text/html; charset=UTF-8");
+    response.getWriter().write(
+        "<!doctype html><html><head><meta charset='utf-8'><title>Contact API</title></head><body>" +
+        "<h2>Contact API 运行正常</h2>" +
+        "<p>请使用 <code>POST /contact</code> 提交表单（字段：user_name, user_email, user_message）。</p>" +
+        "</body></html>"
+    );
+}
+
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");

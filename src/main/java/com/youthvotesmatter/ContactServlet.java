@@ -12,6 +12,8 @@ import jakarta.mail.internet.*;
 @WebServlet("/contact")
 public class ContactServlet extends HttpServlet {
 
+    private static final String FRONTEND_URL = "https://youthvotesmatter.org/contact.html";
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -26,7 +28,7 @@ public class ContactServlet extends HttpServlet {
         // 简单校验
         if (name == null || email == null || message == null ||
                 name.isBlank() || email.isBlank() || message.isBlank()) {
-            response.sendRedirect("contact.html?error=1");
+            response.sendRedirect(FRONTEND_URL + "?error=1");
             return;
         }
 
@@ -34,12 +36,12 @@ public class ContactServlet extends HttpServlet {
             // ✅ 发送邮件到你的邮箱
             sendEmail(name, email, message);
 
-            // ✅ 成功后跳回 contact.html
-            response.sendRedirect("contact.html?success=1");
+            // ✅ 提交成功，跳回 GitHub Pages 的 contact.html
+            response.sendRedirect(FRONTEND_URL + "?success=1");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("contact.html?error=2");
+            response.sendRedirect(FRONTEND_URL + "?error=2");
         }
     }
 
@@ -55,13 +57,13 @@ public class ContactServlet extends HttpServlet {
     private static void sendEmail(String name, String fromEmail, String userMessage) throws Exception {
         String host = System.getenv("SMTP_HOST");
         String port = System.getenv("SMTP_PORT");
-        String username = System.getenv("SMTP_USERNAME"); // Gmail账号
+        String username = System.getenv("SMTP_USERNAME"); // Gmail
         String password = System.getenv("SMTP_PASSWORD"); // 16位应用密码
-        String to = System.getenv("MAIL_TO");             // 你的收件邮箱
+        String to = System.getenv("MAIL_TO");             // 收件邮箱
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");  // Gmail 必须启用 TLS
+        props.put("mail.smtp.starttls.enable", "true");  // Gmail 必备
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", port);
 
@@ -75,7 +77,7 @@ public class ContactServlet extends HttpServlet {
         MimeMessage msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(username, "YouthVotesMatter"));
         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-        msg.setReplyTo(new Address[]{new InternetAddress(fromEmail)});
+        msg.setReplyTo(new Address[]{ new InternetAddress(fromEmail) });
 
         msg.setSubject("New Contact Form Submission from " + name, "UTF-8");
 
@@ -89,11 +91,10 @@ public class ContactServlet extends HttpServlet {
         Transport.send(msg);
     }
 
-    // ✅ CORS 设置
+    // ✅ 正确 CORS 设置
     private static void addCors(HttpServletRequest req, HttpServletResponse resp) {
         String origin = req.getHeader("Origin");
 
-        // 允许你的正式网站访问
         if ("https://youthvotesmatter.org".equals(origin)) {
             resp.setHeader("Access-Control-Allow-Origin", origin);
             resp.setHeader("Vary", "Origin");

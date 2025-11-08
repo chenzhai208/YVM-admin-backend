@@ -18,65 +18,55 @@ public class ContactServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         addCors(request, response);
-        response.setContentType("text/html; charset=UTF-8");
 
         String name = request.getParameter("user_name");
         String email = request.getParameter("user_email");
         String message = request.getParameter("user_message");
 
         // 简单校验
-        if (name == null || email == null || message == null || name.isBlank() || email.isBlank() || message.isBlank()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("<h3>All fields are required.</h3>");
+        if (name == null || email == null || message == null ||
+                name.isBlank() || email.isBlank() || message.isBlank()) {
+            response.sendRedirect("contact.html?error=1");
             return;
         }
 
-        // 发送邮件
         try {
+            // ✅ 发送邮件到你的邮箱
             sendEmail(name, email, message);
-            response.getWriter().write(
-                "<html><body>" +
-                "<h2>Message Submitted Successfully!</h2>" +
-                "<p>Thank you, " + escape(name) + ". Your message has been received.</p>" +
-                "<p>We will get back to you shortly.</p>" +
-                "</body></html>"
-            );
+
+            // ✅ 成功后跳回 contact.html
+            response.sendRedirect("contact.html?success=1");
+
         } catch (Exception e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("<h3>Failed to send email. Please try again later.</h3>");
+            response.sendRedirect("contact.html?error=2");
         }
     }
 
-    // 健康检查（GET）
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         addCors(request, response);
-        response.setContentType("text/html; charset=UTF-8");
-        response.getWriter().write("<h2>Contact API is running</h2>");
+        response.setContentType("text/plain; charset=UTF-8");
+        response.getWriter().write("Contact API is running");
     }
 
-    // 邮件发送函数
+    // ✅ Gmail SMTP 邮件发送函数
     private static void sendEmail(String name, String fromEmail, String userMessage) throws Exception {
         String host = System.getenv("SMTP_HOST");
         String port = System.getenv("SMTP_PORT");
-        String username = System.getenv("SMTP_USERNAME");
-        String password = System.getenv("SMTP_PASSWORD");
-        String to = System.getenv("MAIL_TO");
-        boolean ssl = Boolean.parseBoolean(System.getenv("SMTP_SSL"));
+        String username = System.getenv("SMTP_USERNAME"); // Gmail账号
+        String password = System.getenv("SMTP_PASSWORD"); // 16位应用密码
+        String to = System.getenv("MAIL_TO");             // 你的收件邮箱
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");  // Gmail 必须启用 TLS
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", port);
 
-        if (ssl) {
-            props.put("mail.smtp.ssl.enable", "true");    // 465
-        } else {
-            props.put("mail.smtp.starttls.enable", "true"); // 587
-        }
-
         Session session = Session.getInstance(props, new Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }
@@ -84,8 +74,8 @@ public class ContactServlet extends HttpServlet {
 
         MimeMessage msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(username, "YouthVotesMatter"));
-        msg.setRecipients(Message.RecipientType.TO, to);
-        msg.setReplyTo(new Address[]{ new InternetAddress(fromEmail) });
+        msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
+        msg.setReplyTo(new Address[]{new InternetAddress(fromEmail)});
 
         msg.setSubject("New Contact Form Submission from " + name, "UTF-8");
 
@@ -99,25 +89,25 @@ public class ContactServlet extends HttpServlet {
         Transport.send(msg);
     }
 
-    // 工具函数
-    private static void addCors(HttpServletRequest req, HttpServletResponse resp){
+    // ✅ CORS 设置
+    private static void addCors(HttpServletRequest req, HttpServletResponse resp) {
         String origin = req.getHeader("Origin");
+
+        // 允许你的正式网站访问
         if ("https://youthvotesmatter.org".equals(origin)) {
             resp.setHeader("Access-Control-Allow-Origin", origin);
             resp.setHeader("Vary", "Origin");
         }
+
         resp.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
         resp.setHeader("Access-Control-Max-Age", "86400");
     }
 
     @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
         addCors(req, resp);
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-    }
-
-    private static String escape(String s){
-        return s.replace("<", "&lt;").replace(">", "&gt;");
     }
 }

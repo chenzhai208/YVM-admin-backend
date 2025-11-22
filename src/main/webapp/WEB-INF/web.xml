@@ -4,5 +4,16 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
                              https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
-    <!-- 使用 @WebServlet 注解即可，无需在此声明 -->
+
+    <!-- 配置 AdminServlet -->
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <servlet-class>com.youthvotesmatter.AdminServlet</servlet-class> <!-- 确保包名正确 -->
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>/https://youthvotesmatter.org/AdminServlet</url-pattern> <!-- 确保这个 URL 映射正确 -->
+    </servlet-mapping>
+
 </web-app>

@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-         version="6.0">
-
-    <!-- 配置 AdminServlet -->
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+             http://java.sun.com/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    
+    <!-- 定义 Servlet -->
     <servlet>
         <servlet-name>AdminServlet</servlet-name>
-        <servlet-class>com.youthvotesmatter.AdminServlet</servlet-class> <!-- 确保包名正确 -->
+        <servlet-class>com.youthvotesmatter.AdminServlet</servlet-class>
     </servlet>
 
+    <!-- 配置 Servlet 映射 -->
     <servlet-mapping>
         <servlet-name>AdminServlet</servlet-name>
-        <url-pattern>/https://youthvotesmatter.org/AdminServlet</url-pattern> <!-- 确保这个 URL 映射正确 -->
+        <url-pattern>/AdminServlet</url-pattern>
     </servlet-mapping>
-
+    
 </web-app>

@@ -18,7 +18,7 @@ public class AdminLoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         // 简单的用户名和密码验证（可扩展为数据库查询）
-        if ("admin".equals(username) && "password123".equals(password)) {
+        if ("admin".equals(username) && "123".equals(password)) {
             // 验证通过，重定向到管理面板
             response.sendRedirect("/admin/dashboard");
         } else {
